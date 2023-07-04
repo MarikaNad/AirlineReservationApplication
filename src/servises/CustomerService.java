@@ -5,10 +5,8 @@ import model.Customer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 
 public class CustomerService {
-
     HashMap<String, Customer> customers = new HashMap<>();
 
     public void addCustomer(String firstName, String lastName, String email) {
@@ -25,4 +23,10 @@ public class CustomerService {
         return customers.values();
 //        return customers;
     }
+
+//    //checking that  email exists in hashmap, make it public to get access in main menu
+//    public boolean doesCustomerExist(String email) {
+//        return customers.containsKey(email);
+//    }
+
 }
