@@ -1,5 +1,6 @@
 package ui;
 
+import model.Booking;
 import model.CabinClass;
 import model.Customer;
 import model.FlightDetails;
@@ -8,8 +9,10 @@ import servises.CustomerService;
 
 import java.util.Date;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 import static ui.Console.DATE_FORMAT;
+import static ui.Console.emailPattern;
 
 public class MainMenu {
     CustomerService customerService = new CustomerService();
@@ -55,10 +58,10 @@ public class MainMenu {
         String departureCity = Console.readText("Please enter Departure City: ");
         String destinationCity = Console.readText("Please enter Arrival City: ");
         Date departureDate = Console.readDate("Please enter Departure date ex: dd/mm/yyyy ");
-        boolean returnFlightQuery = Console.readQuery("Would you like to search and book return Flight? y/n ");
-        if (returnFlightQuery) {
-            Date ReturnDate = Console.readDate("Please enter Return Flight date ex: dd/mm/yyyy ");
-        }
+//        boolean returnFlightQuery = Console.readQuery("Would you like to search and book return Flight? y/n ");
+//        if (returnFlightQuery) {
+//            Date ReturnDate = Console.readDate("Please enter Return Flight date ex: dd/mm/yyyy ");
+//        }
         int classSelected = Console.readNumber("Enter cabin class: 1 for Economy, 2 for Business, 3 First ", 1, 3);
 
         CabinClass chosenClass;
@@ -98,8 +101,6 @@ public class MainMenu {
                 boolean hasAccount = Console.readQuery("Do you have an Account with us? y/n ");
                 if (hasAccount) {
                     String email = Console.readEmail("Enter your email please, format: name@domain.com ");
-
-                    // TODO maybe this is better than just `customerService.doesCustomerExist(email)`?
                     Customer custom = customerService.getCustomer(email);
 
                     if (custom != null) {
@@ -111,8 +112,13 @@ public class MainMenu {
                             System.out.println("This Flight Number is not available. Please enter a valid Flight number.");
                         } else {
                             // Perform the booking with the selected flight
-                            // TODO: Implement the booking logic
-                            break;
+                            boolean bookingSuccessful = bookingService.bookAFlight(email, selectedFlightNumber);
+                            if (bookingSuccessful) {
+                                System.out.println("Booking was successful!");
+                                break;
+                            } else {
+                                System.out.println("Booking failed. Please try again.");
+                            }
                         }
                     } else {
                         System.out.println("Please go back and create an Account");
@@ -124,6 +130,10 @@ public class MainMenu {
             } else {
                 break;
             }
+        }
+        boolean returnFlightQuery = Console.readQuery("Would you like to search and book return Flight? y/n ");
+        if (returnFlightQuery) {
+            Date ReturnDate = Console.readDate("Please enter Return Flight date ex: dd/mm/yyyy ");
         }
     }
 
@@ -138,7 +148,28 @@ public class MainMenu {
     }
 
     private void viewBookedFlights() {
-        throw new RuntimeException("not ready yet");
+        System.out.println("Booking Information");
+        System.out.println("------------------------------------------");
+
+        if (bookingService.getAllBookings().isEmpty()) {
+            System.out.println("Sorry no booked flights found.");
+        } else {
+            for (Booking booking : bookingService.getAllBookings()) {
+                System.out.println("Booking ID: " + booking.getBookingID());
+                System.out.println("Booking Flight Number: " + booking.getFlightNumber());
+                System.out.println("Customer email: " + booking.getEmail());
+
+                FlightDetails bookedFlightDetails = bookingService.getFlight(booking.getFlightNumber());
+                if (bookedFlightDetails != null) {
+                    System.out.println("Departure City: " + bookedFlightDetails.getDepartureDetails().getDepartureCity());
+                    System.out.println("Arrival City: " + bookedFlightDetails.getArrivalDetails().getArrivalCity());
+                    System.out.println("Departure Date: " + DATE_FORMAT.format(bookedFlightDetails.getDepartureDetails().getDepartureDate()));
+                    System.out.println("Cabin Class: " + bookedFlightDetails.getCabinClass());
+                    System.out.println("Flight Price: " + bookedFlightDetails.getFlightPrice());
+                    System.out.println("------------------------------------------");
+                }
+            }
+        }
     }
 
     private void createAccount() {

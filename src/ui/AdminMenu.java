@@ -8,7 +8,10 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 public class AdminMenu {
     final CustomerService customerService;
@@ -46,7 +49,7 @@ public class AdminMenu {
     private void printAdminMenu() {
         System.out.println("------------------------------------------");
         System.out.println("1. See all Customers");
-        System.out.println("2. Display available flights");
+        System.out.println("2. Display all available flights");
         System.out.println("3. Display Unbooked Flights");
         System.out.println("4. Add a flight destinations and dates");
         System.out.println("5. Back to the main menu");
@@ -86,7 +89,40 @@ public class AdminMenu {
         }
     }
     private void displayUnBooked () {
-        throw new RuntimeException("not ready yet");
+        System.out.println("Available Flights");
+        System.out.println("------------------------------------------");
+
+        Collection<FlightDetails> allFlights = bookingService.getAllFlights();
+        Collection<Booking> allBookings = bookingService.getAllBookings();
+        List<FlightDetails> unbookedFlights = new ArrayList<>();
+
+        for (FlightDetails flight : allFlights) {
+            boolean isBooked = false;
+            for (Booking booking : allBookings) {
+                if (booking.getFlightNumber().equals(flight.getFlightNumber())) {
+                    isBooked = true;
+                    break;
+                }
+            }
+
+            if (!isBooked) {
+                unbookedFlights.add(flight);
+            }
+        }
+
+        if (unbookedFlights.isEmpty()) {
+            System.out.println("No unbooked flights available.");
+        } else {
+            for (FlightDetails flight : unbookedFlights) {
+                System.out.println("Flight Number: " + flight.getFlightNumber());
+                System.out.println("Departure City: " + flight.getDepartureDetails().getDepartureCity());
+                System.out.println("Arrival City: " + flight.getArrivalDetails().getArrivalCity());
+                System.out.println("Departure Date: " + DATE_FORMAT.format(flight.getDepartureDetails().getDepartureDate()));
+                System.out.println("Cabin Class: " + flight.getCabinClass());
+                System.out.println("Flight Price: " + flight.getFlightPrice());
+                System.out.println("------------------------------------------");
+            }
+        }
     }
 
     private void addFlightsDestinations () {

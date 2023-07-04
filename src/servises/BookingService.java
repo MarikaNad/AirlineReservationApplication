@@ -50,12 +50,19 @@ public class BookingService {
         return availableFlights;
     }
 
-    public void bookAFlight(String email, String flightNumber) {
+    public boolean bookAFlight(String email, String flightNumber) {
         String bookingID = UUID.randomUUID().toString();
 
         Booking booking = new Booking(bookingID, email, flightNumber);
 
         bookedFlights.put(bookingID, booking);
+
+        boolean bookingSuccessful = true;
+        return bookingSuccessful;
+    }
+
+    public Collection<Booking> getAllBookings() {
+        return bookedFlights.values();
     }
 }
 
