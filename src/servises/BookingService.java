@@ -64,6 +64,38 @@ public class BookingService {
     public Collection<Booking> getAllBookings() {
         return bookedFlights.values();
     }
+
+//  this method is not working because flight details has flight number AND Booked flights automatically generates different ID
+//    public List<FlightDetails> findUnBookedFlights () {
+//
+//        List<FlightDetails> notBookedFlights = new ArrayList<>();
+//
+//        for (FlightDetails free : flights.values()) {
+//            if(!bookedFlights.containsKey(free.getFlightNumber())) {
+//                notBookedFlights.add(free);
+//            }
+//        }
+//        return notBookedFlights;
+//    }
+
+    public List<FlightDetails> findUnBookedFlights() {
+
+        List<FlightDetails> notBookedFlights = new ArrayList<>();
+
+        for (FlightDetails flight : flights.values()) {
+            boolean isBooked = false;
+            for (Booking booking : bookedFlights.values()) {
+                if (booking.getFlightNumber().equals(flight.getFlightNumber())) {
+                    isBooked = true;
+                    break;
+                }
+            }
+            if (!isBooked) {
+                notBookedFlights.add(flight);
+            }
+        }
+        return notBookedFlights;
+    }
 }
 
 
